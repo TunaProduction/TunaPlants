@@ -16,13 +16,19 @@
 
 package com.tunacreations.tunaplants.ui
 
+import android.Manifest
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.AndroidEntryPoint
 import com.tunacreations.tunaplants.core.ui.MyApplicationTheme
 
@@ -33,6 +39,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
+                val context = LocalContext.current
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission()
+                ) { isGranted ->
+                    if (!isGranted) {
+                        Toast.makeText(context, "Camera permission is required", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                LaunchedEffect(Unit) {
+                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

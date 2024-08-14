@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -33,10 +34,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.tunacreations.tunaplants.core.ui.R
+import com.tunacreations.tunaplants.core.ui.commonComponents.camera.CameraPreview
 
 @Composable
 fun PlantsScreen(modifier: Modifier = Modifier, viewModel: PlantsViewModel = hiltViewModel()) {
@@ -56,24 +60,35 @@ internal fun PlantsScreen(
     onSave: (name: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier) {
-        var namePlants by remember { mutableStateOf("Compose") }
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            TextField(
-                value = namePlants,
-                onValueChange = { namePlants = it }
-            )
 
-            Button(modifier = Modifier.width(96.dp), onClick = { onSave(namePlants) }) {
-                Text("Save")
+    val plantsName = stringResource(id = R.string.plants_name)
+    var namePlants by remember { mutableStateOf(plantsName) }
+    LazyColumn(modifier) {
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                TextField(
+                    value = namePlants,
+                    onValueChange = { namePlants = it }
+                )
+
+                Button(modifier = Modifier.width(96.dp), onClick = { onSave(namePlants) }) {
+                    Text("Save")
+                }
             }
         }
-        items.forEach {
-            Text("Saved item: $it")
+
+        item {
+            CameraPreview()
         }
+
+        /*items.forEach {
+            Text("Saved item: $it")
+        }*/
     }
 }
 
