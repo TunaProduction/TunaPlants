@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.tunacreations.tunaplants.core.ui.commonComponents.camera.CameraScreen
 import com.tunacreations.tunaplants.feature.plants.ui.PlantsScreen
 
 @Composable
@@ -30,7 +31,13 @@ fun MainNavigation() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "main") {
-        composable("main") { PlantsScreen(modifier = Modifier.padding(16.dp)) }
+        composable("main") { PlantsScreen(navController = navController, modifier = Modifier.padding(16.dp)) }
         // TODO: Add more destinations
+
+        composable("camera") {
+            CameraScreen(navController) { capturedImageUri ->
+                navController.previousBackStackEntry?.savedStateHandle?.set("imageUri", capturedImageUri)
+            }
+        }
     }
 }

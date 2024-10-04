@@ -16,6 +16,7 @@ hilt = "2.52"
 junit = "4.13.2"
 kotlin = "2.0.10"
 ksp = "2.0.10-1.0.24"
+coil = "2.1.0"
 
 
 [libraries]
@@ -51,6 +52,8 @@ androidx-camera = {module = "androidx.camera:camera-view", version.ref = "androi
 androidx-camera-lifecycle = {module = "androidx.camera:camera-lifecycle", version.ref = "androidxCamera"}
 androidx-camera-core = {module = "androidx.camera:camera-core", version.ref = "androidxCamera"}
 androidx-camera-camera2 = {module = "androidx.camera:camera-camera2", version.ref = "androidxCamera"}
+coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
