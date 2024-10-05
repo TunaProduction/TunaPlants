@@ -16,6 +16,7 @@
 
 package com.tunacreations.tunaplants.core.data.di
 
+import android.net.Uri
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -42,6 +43,19 @@ class FakePlantsRepository @Inject constructor() : PlantsRepository {
     override val plantss: Flow<List<String>> = flowOf(fakePlantss)
 
     override suspend fun add(name: String) {
+        throw NotImplementedError()
+    }
+
+    override suspend fun uploadPlantData(
+        plantName: String,
+        imageUri: Uri,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        throw NotImplementedError()
+    }
+
+    override suspend fun syncUnsyncedPlants() {
         throw NotImplementedError()
     }
 }

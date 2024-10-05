@@ -16,6 +16,10 @@
 
 package com.tunacreations.tunaplants.feature.plants.ui
 
+import android.net.Uri
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +40,9 @@ class PlantsViewModel @Inject constructor(
     private val plantsRepository: PlantsRepository
 ) : ViewModel() {
 
+    private val _uploadStatus = MutableLiveData<Boolean>()
+    val uploadStatus: LiveData<Boolean> = _uploadStatus
+
     val uiState: StateFlow<PlantsUiState> = plantsRepository
         .plantss.map<List<String>, PlantsUiState> { Success(data = it) }
         .catch { emit(Error(it)) }
@@ -44,6 +51,27 @@ class PlantsViewModel @Inject constructor(
     fun addPlants(name: String) {
         viewModelScope.launch {
             plantsRepository.add(name)
+        }
+    }
+
+    fun uploadPlant(plantName: String, imageUri: Uri) {
+        viewModelScope.launch {
+            try {
+                plantsRepository.uploadPlantData(
+                    plantName = plantName,
+                    imageUri = imageUri,
+                    onSuccess = {
+                        _uploadStatus.value = true
+                    },
+                    onFailure = { exception ->
+                        _uploadStatus.value = false
+                        Log.e("PlantViewModel", "Error uploading plant data: ${exception.message}")
+                    }
+                )
+            } catch (e: Exception) {
+                _uploadStatus.value = false
+                Log.e("PlantViewModel", "Unexpected error: ${e.message}")
+            }
         }
     }
 }

@@ -40,6 +40,9 @@ interface PlantsDao {
     @Query("SELECT * FROM plants ORDER BY uid DESC LIMIT 10")
     fun getPlants(): Flow<List<Plants>>
 
+    @Query("SELECT * FROM plants WHERE isSynced = 0")
+    suspend fun getUnsyncedPlants(): List<Plants>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlants(item: Plants)
 
