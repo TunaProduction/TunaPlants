@@ -19,7 +19,7 @@ package com.tunacreations.tunaplants.core.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
-@Database(entities = [Plants::class], version = 1)
+@Database(entities = [Plants::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun plantsDao(): PlantsDao
 }

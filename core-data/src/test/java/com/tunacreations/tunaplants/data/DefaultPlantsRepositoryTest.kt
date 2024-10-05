@@ -48,7 +48,7 @@ private class FakePlantsDao : PlantsDao {
 
     private val data = mutableListOf<Plants>()
 
-    override fun getPlantss(): Flow<List<Plants>> = flow {
+    override fun getPlants(): Flow<List<Plants>> = flow {
         emit(data)
     }
 

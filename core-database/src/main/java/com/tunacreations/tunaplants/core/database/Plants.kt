@@ -19,13 +19,17 @@ package com.tunacreations.tunaplants.core.database
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Entity
 data class Plants(
-    val name: String
+    val name: String,
+    val imageUri: String,
+    val isSynced: Boolean = false
 ) {
     @PrimaryKey(autoGenerate = true)
     var uid: Int = 0
@@ -34,8 +38,11 @@ data class Plants(
 @Dao
 interface PlantsDao {
     @Query("SELECT * FROM plants ORDER BY uid DESC LIMIT 10")
-    fun getPlantss(): Flow<List<Plants>>
+    fun getPlants(): Flow<List<Plants>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlants(item: Plants)
+
+    @Update
+    suspend fun updatePlant(plant: Plants)
 }

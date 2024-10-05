@@ -16,26 +16,78 @@
 
 package com.tunacreations.tunaplants.core.data
 
+import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.tunacreations.tunaplants.core.database.Plants
 import com.tunacreations.tunaplants.core.database.PlantsDao
+import java.util.UUID
 import javax.inject.Inject
 
 interface PlantsRepository {
     val plantss: Flow<List<String>>
 
     suspend fun add(name: String)
+    suspend fun uploadPlantData(
+        plantName: String,
+        imageUri: Uri,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    )
 }
 
 class DefaultPlantsRepository @Inject constructor(
     private val plantsDao: PlantsDao
 ) : PlantsRepository {
 
+    private val storageReference = FirebaseStorage.getInstance().reference
+    private val firestore = FirebaseFirestore.getInstance()
+
+    // Function to upload plant data
+    suspend fun uploadPlantData(
+        plantName: String,
+        imageUri: Uri,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        try {
+            // Save to local database first
+            plantsDao.insertPlants(Plants(name = plantName, imageUri = imageUri.toString()))
+
+            // Try uploading to Firebase
+            val imageFileName = "plants/${UUID.randomUUID()}.jpg"
+            val imageRef = storageReference.child(imageFileName)
+
+            imageRef.putFile(imageUri)
+                .addOnSuccessListener {
+                    imageRef.downloadUrl.addOnSuccessListener { uri ->
+                        val imageUrl = uri.toString()
+                        val plantData = hashMapOf("name" to plantName, "imageUrl" to imageUrl)
+
+                        firestore.collection("plants")
+                            .add(plantData)
+                            .addOnSuccessListener {
+                                // Update local database to mark this plant as synced
+                                plantsDao.updatePlant(Plants(name = plantName, imageUri = imageUrl, isSynced = true))
+                                onSuccess()
+                            }
+                            .addOnFailureListener { exception ->
+                                onFailure(exception)
+                            }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    onFailure(exception)
+                }
+        } catch (e: Exception) {
+            onFailure(e)
+        }
+    }
+
     override val plantss: Flow<List<String>> =
-        plantsDao.getPlantss().map { items -> items.map { it.name } }
+        plantsDao.getPlants().map { items -> items.map { it.name } }
 
     override suspend fun add(name: String) {
-        plantsDao.insertPlants(Plants(name = name))
+        //plantsDao.insertPlants(Plants(name = name))
     }
 }
